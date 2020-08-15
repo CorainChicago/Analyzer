@@ -23,6 +23,11 @@ public class AnalyzeResponse {
         this.name = name;
     }
 
+    public AnalyzeResponse(String name, String original) {
+        this.name = name;
+        this.original = original;
+    }
+
     public AnalyzeResponse() {
     }
 
