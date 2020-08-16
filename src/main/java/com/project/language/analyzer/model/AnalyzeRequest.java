@@ -9,6 +9,14 @@ public class AnalyzeRequest {
     private Boolean useStopWords;
     private Boolean useRootWords;
 
+
+    public AnalyzeRequest(String name, String text, Boolean useStopWords, Boolean useRootWords) {
+        this.name = name;
+        this.text = text;
+        this.useStopWords = useStopWords;
+        this.useRootWords = useRootWords;
+    }
+
     public String getName() {
         return name;
     }

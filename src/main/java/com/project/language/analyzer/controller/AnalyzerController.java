@@ -2,15 +2,11 @@ package com.project.language.analyzer.controller;
 
 import com.project.language.analyzer.AnalyzerService;
 import com.project.language.analyzer.model.AnalyzeRequest;
-import com.project.language.analyzer.model.AnalyzeResponse;
-import org.springframework.http.MediaType;
+import com.project.language.analyzer.entity.AnalyzeResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Controller
 public class AnalyzerController {
@@ -26,9 +22,9 @@ public class AnalyzerController {
         return service.findByName(name);
     }
 
-    @GetMapping(value = "/analysis")
-    public @ResponseBody AnalyzeResponse getLatestAnalysis(@RequestParam(value="count", required=true) String count){
-        return null;
+    @GetMapping(value = "/previous")
+    public @ResponseBody List<AnalyzeResponse> getLatestAnalysis(@RequestParam(value="count", required=true) Integer count){
+        return service.getPrevious(count);
     }
 
     @PostMapping(value = "/")

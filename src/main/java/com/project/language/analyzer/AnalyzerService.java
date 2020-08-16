@@ -1,9 +1,10 @@
 package com.project.language.analyzer;
 
 import com.project.language.analyzer.model.AnalyzeRequest;
-import com.project.language.analyzer.model.AnalyzeResponse;
+import com.project.language.analyzer.entity.AnalyzeResponse;
 import com.project.language.analyzer.repository.AnalysisResponseRepository;
 import com.project.language.analyzer.utilities.FileUtility;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class AnalyzerService {
     @PostConstruct
     public void initialize() {
         try {
-            stopWords = fileUtility.readFile("stopWords/*").get(0);
+            stopWords = fileUtility.readFile("stopWords/*").get("stopwords.txt");
             text = fileUtility.readFile("text/*");
             text.forEach((k, v) -> {
                 if (Objects.isNull(repository.findByName(k))) {
@@ -48,17 +49,19 @@ public class AnalyzerService {
 
     public AnalyzeResponse processAndSave(AnalyzeRequest request) {
         AnalyzeResponse response;
-        if (request.getText().isEmpty() || request.getText().isBlank()) {
+        List<String> list;
+        if (Objects.isNull(request.getText()) || request.getText().isEmpty() || request.getText().isBlank()) {
             response = repository.findByName(request.getName());
+            LOGGER.error("response {}", response);
+            list  = convertStringIntoCleanList(response.getOriginal());
         } else {
             response = new AnalyzeResponse(request.getName(), request.getUseStopWords(), request.getUseRootWords());
+            list = convertStringIntoCleanList(request.getText());
+            response.setOriginal(request.getText());
         }
 
-        List<String> list = convertStringIntoCleanList(request.getText());
-        response.setOriginal(request.getText());
-
         if (request.getUseStopWords()) {
-            list.stream().filter(word -> stopWords.contains(word));
+            list = list.stream().filter(word -> !stopWords.contains(word)).collect(Collectors.toList());
         }
         if (request.getUseRootWords()) {
             list.stream().map(word -> getStemWords(word));
@@ -137,10 +140,22 @@ public class AnalyzerService {
 
     private List<String> findTop25Words(LinkedHashMap<String, Integer> hash) {
         List<String> results = new ArrayList<>(hash.keySet());
-        return results.subList(0, 24);
+        if(results.size() >= 25) {
+            return results.subList(0, 24);
+        }else {
+            return results;
+        }
     }
 
     public AnalyzeResponse findByName(String name) {
         return repository.findByName(name);
+    }
+
+    public List<AnalyzeResponse> getPrevious(Integer count) {
+
+        Comparator<AnalyzeResponse> compareByCreateAt = (AnalyzeResponse a, AnalyzeResponse b) -> a.getCreatedAt().compareTo( b.getCreatedAt());
+        List<AnalyzeResponse> responses = repository.findAll();
+        Collections.sort(responses, compareByCreateAt);
+        return responses.subList(0, count);
     }
 }

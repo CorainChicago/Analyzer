@@ -1,10 +1,16 @@
-package com.project.language.analyzer.model;
+package com.project.language.analyzer.entity;
 
+import org.apache.logging.log4j.CloseableThreadContext;
+import org.springframework.data.annotation.Id;
+
+import java.time.Instant;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class AnalyzeResponse {
 
+    @Id
     private String id;
     private String name;
     private String original;
@@ -12,23 +18,26 @@ public class AnalyzeResponse {
     private Boolean useRootWords;
     private LinkedHashMap<String, Integer> result;
     private List<String> top25WordsUsed;
+    private Date createdAt;
 
-    public AnalyzeResponse(String name, Boolean useStopWords, Boolean useRootWords) {
-        this.name = name;
-        this.useStopWords = useStopWords;
-        this.useRootWords = useRootWords;
-    }
+    public AnalyzeResponse() { }
 
     public AnalyzeResponse(String name) {
         this.name = name;
+        createdAt = Date.from(Instant.now());
     }
 
     public AnalyzeResponse(String name, String original) {
         this.name = name;
         this.original = original;
+        createdAt = Date.from(Instant.now());
     }
 
-    public AnalyzeResponse() {
+    public AnalyzeResponse(String name, Boolean useStopWords, Boolean useRootWords) {
+        this.name = name;
+        this.useStopWords = useStopWords;
+        this.useRootWords = useRootWords;
+        createdAt = Date.from(Instant.now());
     }
 
     public String getId() {
@@ -85,6 +94,8 @@ public class AnalyzeResponse {
         return this;
     }
 
+    public Date getCreatedAt() { return this.createdAt; }
+
     public List<String> getTop25WordsUsed() {
         return top25WordsUsed;
     }
@@ -92,5 +103,19 @@ public class AnalyzeResponse {
     public AnalyzeResponse setTop25WordsUsed(List<String> top25WordsUsed) {
         this.top25WordsUsed = top25WordsUsed;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "AnalyzeResponse{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", useStopWords=" + useStopWords +
+                ", useRootWords=" + useRootWords +
+                ", top25WordsUsed=" + top25WordsUsed +
+                ", result=" + result +
+                ", original='" + original + '\'' +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
