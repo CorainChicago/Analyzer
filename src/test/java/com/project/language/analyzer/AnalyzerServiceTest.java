@@ -81,6 +81,28 @@ public class AnalyzerServiceTest {
     }
 
     @Test
+    public void processAndSaveWitStopWordsAndRoots() throws IOException {
+        AnalyzeRequest request = new AnalyzeRequest(
+                "test All Stop Words",
+                "DSS FC CAT DOG CAT CATEVM CAZL CA CA NGPZL",
+                true,
+                true);
+        HashMap<String, List<String>> stopMap = new HashMap<>();
+        List<String> stopList = new ArrayList<>();
+        stopList.add("DSS");
+        stopList.add("FC");
+        stopMap.put("stopwords.txt", stopList);
+        when(fileUtilityMock.readFile("stopWords/*")).thenReturn(stopMap);
+        underTest.initialize();
+        AnalyzeResponse response = underTest.processAndSave(request);
+        assertNotNull(response);
+        assertEquals(response.getName(), request.getName());
+        assertEquals(5, response.getTop25WordsUsed().size());
+        assertEquals(5, response.getResult().size());
+        assertEquals(3, response.getResult().get("CAT"));
+    }
+
+    @Test
     void findByName() {
     }
 }

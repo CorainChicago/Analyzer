@@ -64,7 +64,7 @@ public class AnalyzerService {
             list = list.stream().filter(word -> !stopWords.contains(word)).collect(Collectors.toList());
         }
         if (request.getUseRootWords()) {
-            list.stream().map(word -> getStemWords(word));
+           list = list.stream().map(word -> getStemWords(word)).collect(Collectors.toList());
         }
 
         response.setResult(generateWordCount(list));
@@ -114,7 +114,7 @@ public class AnalyzerService {
     }
 
     private String getStemWords(String word) {
-        if (word.endsWith("L") && word.length() > 1) {
+        if (word.endsWith("L") && !word.endsWith("ZL") && !word.endsWith("EZL") && word.length() > 1) {
             return word.substring(0, word.length() - 1);
         }
         if (word.endsWith("“LZ") && word.length() > 2) {
@@ -123,14 +123,14 @@ public class AnalyzerService {
         if (word.endsWith("EVM") && word.length() > 3) {
             return word.substring(0, word.length() - 3);
         }
-        if (word.endsWith("“ZQ") && word.length() > 2) {
+        if (word.endsWith("“ZQ") && !word.endsWith("EZL") && word.length() > 2) {
             return word.substring(0, word.length() - 2);
         }
-        if (word.endsWith("ZL") && word.length() > 2) {
+        if (word.endsWith("ZL") && !word.endsWith("PZL") && word.length() > 2) {
             return word.substring(0, word.length() - 2) + "A";
         }
         if (word.endsWith("PZL") && word.length() > 3) {
-            return word.substring(0, word.length() - 2) + "AZ";
+            return word.substring(0, word.length() - 3) + "AZ";
         }
         if (word.endsWith("EZL") && word.length() > 3) {
             return word.substring(0, word.length() - 3) + "R";
