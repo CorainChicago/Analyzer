@@ -2,18 +2,13 @@ package com.project.language.analyzer;
 
 import com.project.language.analyzer.model.AnalyzeRequest;
 import com.project.language.analyzer.model.AnalyzeResponse;
-import com.project.language.analyzer.repository.AnalysisRequestRepository;
+import com.project.language.analyzer.repository.AnalysisResponseRepository;
 import com.project.language.analyzer.utilities.FileUtility;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,14 +19,14 @@ public class AnalyzerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AnalyzerService.class);
 
     private final FileUtility fileUtility;
-    private final AnalysisRequestRepository repository;
+    private final AnalysisResponseRepository repository;
 
     private HashMap<String, List<String>> text;
     private List<String> stopWords;
 
     public AnalyzerService(
             FileUtility fileUtility,
-            AnalysisRequestRepository repository) {
+            AnalysisResponseRepository repository) {
         this.fileUtility = fileUtility;
         this.repository = repository;
     }
@@ -41,10 +36,10 @@ public class AnalyzerService {
         try {
             stopWords = fileUtility.readFile("stopWords/*").get(0);
             text = fileUtility.readFile("text/*");
-            text.forEach((k,v) -> {
-                    if(repository.findByName(k).isEmpty()){
-                        repository.save(new AnalyzeResponse(k, v.toString()));
-                    }
+            text.forEach((k, v) -> {
+                if (Objects.isNull(repository.findByName(k))) {
+                    repository.save(new AnalyzeResponse(k, v.toString()));
+                }
             });
         } catch (IOException e) {
             LOGGER.error("IOException occurred {}", e);
@@ -52,7 +47,12 @@ public class AnalyzerService {
     }
 
     public AnalyzeResponse processAndSave(AnalyzeRequest request) {
-        AnalyzeResponse response = new AnalyzeResponse(request.getName(), request.getUseStopWords(), request.getUseRootWords());
+        AnalyzeResponse response;
+        if (request.getText().isEmpty() || request.getText().isBlank()) {
+            response = repository.findByName(request.getName());
+        } else {
+            response = new AnalyzeResponse(request.getName(), request.getUseStopWords(), request.getUseRootWords());
+        }
 
         List<String> list = convertStringIntoCleanList(request.getText());
         response.setOriginal(request.getText());
@@ -132,9 +132,7 @@ public class AnalyzerService {
         if (word.endsWith("EZL") && word.length() > 3) {
             return word.substring(0, word.length() - 3) + "R";
         }
-
         return word;
-
     }
 
     private List<String> findTop25Words(LinkedHashMap<String, Integer> hash) {
@@ -142,4 +140,7 @@ public class AnalyzerService {
         return results.subList(0, 24);
     }
 
+    public AnalyzeResponse findByName(String name) {
+        return repository.findByName(name);
+    }
 }

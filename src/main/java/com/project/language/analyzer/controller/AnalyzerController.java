@@ -21,9 +21,9 @@ public class AnalyzerController {
         this.service = service;
     }
 
-    @GetMapping(value = "/name")
-    public @ResponseBody AnalyzeResponse getAnalysisByName(@RequestParam(value="name", required=true) String name){
-       return null;
+    @GetMapping(value = "/")
+    public @ResponseBody AnalyzeResponse getAnalysisByName(@RequestBody String name) {
+        return service.findByName(name);
     }
 
     @GetMapping(value = "/analysis")

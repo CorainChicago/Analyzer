@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AnalysisRequestRepository extends MongoRepository<AnalyzeResponse, String> {
+public interface AnalysisResponseRepository extends MongoRepository<AnalyzeResponse, String> {
 
-    List<String> findByName(String name);
+    AnalyzeResponse findByName(String name);
 }
