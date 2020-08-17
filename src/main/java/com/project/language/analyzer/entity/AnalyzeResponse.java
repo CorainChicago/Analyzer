@@ -1,17 +1,20 @@
 package com.project.language.analyzer.entity;
 
-import org.apache.logging.log4j.CloseableThreadContext;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+@Document("analyzeResponses")
 public class AnalyzeResponse {
 
     @Id
     private String id;
+    @Field("name")
     private String name;
     private String original;
     private Boolean useStopWords;

@@ -4,11 +4,8 @@ import com.project.language.analyzer.entity.AnalyzeResponse;
 import com.project.language.analyzer.model.AnalyzeRequest;
 import com.project.language.analyzer.repository.AnalysisResponseRepository;
 import com.project.language.analyzer.utilities.FileUtility;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.IOException;
@@ -49,8 +46,8 @@ public class AnalyzerServiceTest {
         AnalyzeRequest request = new AnalyzeRequest(
                 "test",
                 "KMHFLDVQL HA LIEZVKEAEI DUKEISZL DUZ DUZE CFXSELMZQ DIUHLL DIUHLL DIUHLL QHGZVL HA BHFUVDSL DVQ QELIECSEVZL. LHNZ LK",
-                true,
-                true);
+                false,
+                false);
         AnalyzeResponse response = underTest.processAndSave(request);
         assertNotNull(response);
         assertEquals(response.getName(), request.getName());
@@ -64,7 +61,7 @@ public class AnalyzerServiceTest {
                 "test All Stop Words",
                 "DSS FC CAT DOG CAT",
                 true,
-                true);
+                false);
         HashMap<String, List<String>> stopMap = new HashMap<>();
         List<String> stopList = new ArrayList<>();
         stopList.add("DSS");
@@ -100,9 +97,5 @@ public class AnalyzerServiceTest {
         assertEquals(5, response.getTop25WordsUsed().size());
         assertEquals(5, response.getResult().size());
         assertEquals(3, response.getResult().get("CAT"));
-    }
-
-    @Test
-    void findByName() {
     }
 }

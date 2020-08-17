@@ -27,7 +27,6 @@ public class FileUtility {
         Resource[] files = resourcePatternResolver.getResources("classpath:" + name + ".txt");
         for(int x = 0; x < files.length; x++){
             result.put(files[x].getFilename(), Arrays.asList(IOUtils.toString(files[x].getInputStream()).split("\\s+")));
-            LOGGER.error(" result is {}", result);
         }
 
         return result;

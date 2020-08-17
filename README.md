@@ -48,15 +48,8 @@ curl -X POST \
 '
 ```
 
-#### Other endpoints
+#### Find Previous Analysis
 
-1. Previous -  `GET` to `http://localhost:8080/previous` with parameters of `count` with an integer will return the most recent number of responses.
-    ```curl
-   curl -X GET \
-     'http://localhost:8080/previous?count=4' \
-     -H 'Content-Type: application/json' \
-    ````
-   
 1. Previous -  `GET` to `http://localhost:8080/previous` with parameters of `count` with an integer will return the most recent number of responses.
     ```curl
    curl -X GET \

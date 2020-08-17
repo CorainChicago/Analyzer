@@ -38,7 +38,7 @@ public class AnalyzerService {
             stopWords = fileUtility.readFile("stopWords/*").get("stopwords.txt");
             text = fileUtility.readFile("text/*");
             text.forEach((k, v) -> {
-                if (Objects.isNull(repository.findByName(k))) {
+                if (Objects.isNull(repository.findFirstByName(k))) {
                     repository.save(new AnalyzeResponse(k, v.toString()));
                 }
             });
@@ -51,8 +51,7 @@ public class AnalyzerService {
         AnalyzeResponse response;
         List<String> list;
         if (Objects.isNull(request.getText()) || request.getText().isEmpty() || request.getText().isBlank()) {
-            response = repository.findByName(request.getName());
-            LOGGER.error("response {}", response);
+            response = repository.findFirstByName(request.getName());
             list  = convertStringIntoCleanList(response.getOriginal());
         } else {
             response = new AnalyzeResponse(request.getName(), request.getUseStopWords(), request.getUseRootWords());
@@ -69,12 +68,20 @@ public class AnalyzerService {
 
         response.setResult(generateWordCount(list));
         response.setTop25WordsUsed(findTop25Words(response.getResult()));
-        repository.save(response);
-
-        LOGGER.info("saved");
-        LOGGER.info("get {}", repository.findAll());
+        AnalyzeResponse r = repository.save(response);
 
         return response;
+    }
+
+    public List<AnalyzeResponse> getPrevious(Integer count) {
+
+        Comparator<AnalyzeResponse> compareByCreateAt = (AnalyzeResponse a, AnalyzeResponse b) -> a.getCreatedAt().compareTo( b.getCreatedAt());
+        List<AnalyzeResponse> responses = repository.findAll();
+        Collections.sort(responses, compareByCreateAt);
+        if(responses.size() >= count){
+            return responses.subList(0, count);
+        }
+        return responses;
     }
 
     private List<String> convertStringIntoCleanList(String text) {
@@ -88,7 +95,7 @@ public class AnalyzerService {
                 Integer count = result.get(word);
                 count++;
                 result.put(word, count);
-            } else {
+            } else if(!word.isBlank() || !word.isEmpty()){
                 result.put(word, 1);
             }
         });
@@ -145,17 +152,5 @@ public class AnalyzerService {
         }else {
             return results;
         }
-    }
-
-    public AnalyzeResponse findByName(String name) {
-        return repository.findByName(name);
-    }
-
-    public List<AnalyzeResponse> getPrevious(Integer count) {
-
-        Comparator<AnalyzeResponse> compareByCreateAt = (AnalyzeResponse a, AnalyzeResponse b) -> a.getCreatedAt().compareTo( b.getCreatedAt());
-        List<AnalyzeResponse> responses = repository.findAll();
-        Collections.sort(responses, compareByCreateAt);
-        return responses.subList(0, count);
     }
 }
